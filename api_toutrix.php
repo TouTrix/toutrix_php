@@ -4,7 +4,7 @@ define("channel_adult",2);
 
 class api_toutrix_adserver extends api_toutrix {
   // TODO - Change to real server, and to https
-  var $endpoint = "http://127.0.0.1:3000/api";
+  var $endpoint = "http://serv.toutrix.com/api";
 
   var $p_login_user = "/users/login";
   var $p_campaign = "/users/:userId/campaigns";
