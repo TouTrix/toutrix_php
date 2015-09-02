@@ -131,10 +131,10 @@ class api_toutrix {
       $result = str_replace(':campaignId', $fields->campaignId, $result);
     if (!empty($this->userId))
       $result = str_replace(':userId', $this->userId, $result);
-    if (!empty($this->siteId))
-      $result = str_replace(':siteId', $this->siteId, $result);
-    if (!empty($this->zoneId))
-      $result = str_replace(':zoneId', $this->zoneId, $result);
+    if (!empty($fields->siteId))
+      $result = str_replace(':siteId', $fields->siteId, $result);
+    if (!empty($fields->zoneId))
+      $result = str_replace(':zoneId', $fields->zoneId, $result);
     return $result;
   }
 
