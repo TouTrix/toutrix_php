@@ -9,6 +9,8 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_login_user = "/users/login";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_creative = "/users/:userId/creatives";
+  var $p_sites = "/users/:userId/sites";
+  var $p_zones = "/sites/:siteId/zones";
   var $p_flight_update = "/flights/:id";
   var $p_flight = "/campaigns/:campaignId/flights";
   var $p_creative_flight = "/creatives_flight";
@@ -39,6 +41,11 @@ class api_toutrix_adserver extends api_toutrix {
      }
   }
 
+  function setAccessToken($token) {
+    $this->access_token = $token;
+    // TODO - We have to get the userId
+  }
+
   function flight_update($fields) {
      $path = $this->do_path($this->p_flight_update, $fields);
      $datas = array('path'=> $path,
@@ -56,7 +63,7 @@ class api_toutrix_adserver extends api_toutrix {
                     'fields'=> $fields
                    );
      $output = $this->launch_request($datas);
-echo $output . "\n";
+//echo $output . "\n";
      return json_decode($output,false);
   }
 
@@ -67,6 +74,16 @@ echo $output . "\n";
 
   function creative_create($fields) {
      $path = $this->do_path($this->p_creative, $fields);
+     return $this->model_create($path, $fields);
+  }
+
+  function site_create($fields) {
+     $path = $this->do_path($this->p_sites, $fields);
+     return $this->model_create($path, $fields);
+  }
+
+  function zone_create($fields) {
+     $path = $this->do_path($this->p_zones, $fields);
      return $this->model_create($path, $fields);
   }
 
@@ -114,6 +131,8 @@ class api_toutrix {
       $result = str_replace(':campaignId', $fields->campaignId, $result);
     if (!empty($this->userId))
       $result = str_replace(':userId', $this->userId, $result);
+    if (!empty($this->zoneId))
+      $result = str_replace(':zoneId', $this->zoneId, $result);
     return $result;
   }
 
