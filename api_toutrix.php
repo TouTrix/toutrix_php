@@ -8,6 +8,7 @@ class api_toutrix_adserver extends api_toutrix {
 
   var $p_login_user = "/users/login";
   var $p_user = "/users";
+  var $p_channels = "/channels";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_creative = "/users/:userId/creatives";
   var $p_sites = "/users/:userId/sites";
@@ -70,8 +71,21 @@ class api_toutrix_adserver extends api_toutrix {
                     'fields'=> $fields
                    );
      $output = $this->launch_request($datas);
-//echo $output . "\n";
      return json_decode($output,false);
+  }
+
+  function model_get($path,$fields) {
+     $datas = array('path'=> $path,
+                    'method'=> 'GET',
+                    'fields'=> $fields
+                   );
+     $output = $this->launch_request($datas);
+     return json_decode($output,false);
+  }
+
+  function channels_get($fields) {
+     $path = $this->do_path($this->p_channels, $fields);
+     return $this->model_get($path, $fields);
   }
 
   function campaign_create($fields) {
@@ -147,7 +161,7 @@ class api_toutrix {
 
   function launch_request($datas) {
     $url = $this->endpoint . $datas['path'];
-echo "URL : " . $url . "\n";
+//echo "URL : " . $url . "\n";
 
     if (strlen($this->access_token)>0)
       $url .= "?access_token=" . $this->access_token;
