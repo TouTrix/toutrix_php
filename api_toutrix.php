@@ -7,6 +7,7 @@ class api_toutrix_adserver extends api_toutrix {
   var $endpoint = "http://serv.toutrix.com/api";
 
   var $p_login_user = "/users/login";
+  var $p_user = "/users";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_creative = "/users/:userId/creatives";
   var $p_sites = "/users/:userId/sites";
@@ -40,6 +41,12 @@ class api_toutrix_adserver extends api_toutrix {
        return false;
      }
   }
+
+  function user_create($fields) {
+     $path = $this->do_path($this->p_user, $fields);
+     return $this->model_create($path, $fields);
+  }
+
 
   function setAccessToken($token) {
     $this->access_token = $token;
