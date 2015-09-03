@@ -9,6 +9,7 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_login_user = "/users/login";
   var $p_user = "/users";
   var $p_channels = "/channels";
+  var $p_adtypes = "/adtypes";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_creative = "/users/:userId/creatives";
   var $p_sites = "/users/:userId/sites";
@@ -85,6 +86,11 @@ class api_toutrix_adserver extends api_toutrix {
 
   function channels_get($fields) {
      $path = $this->do_path($this->p_channels, $fields);
+     return $this->model_get($path, $fields);
+  }
+
+  function adtypes_get($fields) {
+     $path = $this->do_path($this->p_adtypes, $fields);
      return $this->model_get($path, $fields);
   }
 
