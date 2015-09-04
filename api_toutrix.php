@@ -72,7 +72,6 @@ class api_toutrix_adserver extends api_toutrix {
                     'fields'=> $fields
                    );
      $output = $this->launch_request($datas);
-echo $output . "<br/>";
      return json_decode($output, false);
   }
 
