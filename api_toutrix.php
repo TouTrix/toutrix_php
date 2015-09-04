@@ -12,6 +12,8 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_adtypes = "/adtypes";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_creative = "/users/:userId/creatives";
+  var $p_creative_update = "/creatives/:id";
+  var $p_user_creative = "/users/:userId/creatives/:creativeId";
   var $p_sites = "/users/:userId/sites";
   var $p_zones = "/sites/:siteId/zones";
   var $p_flight_update = "/flights/:id";
@@ -75,6 +77,15 @@ class api_toutrix_adserver extends api_toutrix {
      return json_decode($output, false);
   }
 
+  function model_put($path,$fields) {
+     $datas = array('path'=> $path,
+                    'method'=> 'PUT',
+                    'fields'=> $fields
+                   );
+     $output = $this->launch_request($datas);
+     return json_decode($output, false);
+  }
+
   // Channels
 
   function channels_get($fields) {
@@ -111,6 +122,16 @@ class api_toutrix_adserver extends api_toutrix {
   function creatives_list($fields) {
      $path = $this->do_path($this->p_creative, $fields);
      return $this->model_get($path, $fields);
+  }
+
+  function creative_get($fields) {
+     $path = $this->do_path($this->p_user_creative, $fields);
+     return $this->model_get($path, $fields);
+  }
+
+  function creative_update($fields) {
+     $path = $this->do_path($this->p_creative_update, $fields);
+     return $this->model_put($path, $fields);
   }
 
   // Site
@@ -207,6 +228,8 @@ class api_toutrix {
       $result = str_replace(':siteId', $fields->siteId, $result);
     if (!empty($fields->zoneId))
       $result = str_replace(':zoneId', $fields->zoneId, $result);
+    if (!empty($fields->creativeId))
+      $result = str_replace(':creativeId', $fields->creativeId, $result);
     return $result;
   }
 
