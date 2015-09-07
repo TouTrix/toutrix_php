@@ -1,4 +1,6 @@
-<?
+<?php
+// TODO - Add caching on some models like creatives
+
 define("channel_mainstream",1);
 define("channel_adult",2);
 
@@ -11,14 +13,21 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_channels = "/channels";
   var $p_adtypes = "/adtypes";
   var $p_campaign = "/users/:userId/campaigns";
+  var $p_campaign_target = "/campaigns/:campaignId/target";
+  var $p_campaign_update = "/campaigns/:id";
+  var $p_campaign_flight = "/campaigns/:campaignId/flights/:flightId";
   var $p_creative = "/users/:userId/creatives";
   var $p_creative_update = "/creatives/:id";
   var $p_user_creative = "/users/:userId/creatives/:creativeId";
+  var $p_user_campaign = "/users/:userId/campaigns/:campaignId";
   var $p_sites = "/users/:userId/sites";
   var $p_zones = "/sites/:siteId/zones";
   var $p_flight_update = "/flights/:id";
   var $p_flight = "/campaigns/:campaignId/flights";
+  var $p_flight_target = "/flights/:flightId/targets";
   var $p_creative_flight = "/creatives_flight";
+  var $p_creatives_flight = "/flights/:flightId/creative_flight";
+  var $p_creative_flight_one = "/creatives_flight/:id";
   var $p_target = "/targetings";
 
   // Users
@@ -112,6 +121,26 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_get($path, $fields);
   }
 
+  function campaign_get($fields) {
+     $path = $this->do_path($this->p_user_campaign, $fields);
+     return $this->model_get($path, $fields);
+  }
+
+  function campaigns_list($fields) {
+     $path = $this->do_path($this->p_campaign, $fields);
+     return $this->model_get($path, $fields);
+  }
+
+  function campaign_update($fields) {
+     $path = $this->do_path($this->p_campaign_update, $fields);
+     return $this->model_put($path, $fields);
+  }
+
+  function campaign_targets($fields) {
+     $path = $this->do_path($this->p_campaign_target, $fields);
+     return $this->model_get($path, $fields);
+  }
+
   // Creative
 
   function creative_create($fields) {
@@ -155,9 +184,14 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_create($path, $fields);
   }
 
-  function flights_get($fields) {
-     $path = $this->do_path($this->p_flight, $fields);
-     return $this->model_get($path, $fields);
+  function flights_get($fields) {  
+    if (isset($fields->campaignId) && isset($fields->flightId)) {
+      $path = $this->do_path($this->p_campaign_flight, $fields);
+    } else {
+      $path = $this->do_path($this->p_flight, $fields);
+    }
+    //echo $path . "<br/>";
+    return $this->model_get($path, $fields);
   }
 
   function flight_update($fields) {
@@ -172,11 +206,31 @@ class api_toutrix_adserver extends api_toutrix {
      return $returns;
   }
 
+  function flight_targets_get($fields) {
+     $path = $this->do_path($this->p_flight_target, $fields);
+     //echo $path . "<br/>";
+     return $this->model_get($path, $fields);
+  }
+
   // Creative Flight
 
   function creative_flight_create($fields) {
      $path = $this->do_path($this->p_creative_flight, $fields);
      return $this->model_create($path, $fields);
+  }
+
+  function creative_flight_get($fields) {
+     $path = $this->do_path($this->p_creatives_flight . "?filter[where][IsDeleted][neq]=1", $fields);
+     return $this->model_get($path, $fields);
+  }
+
+  function creative_flight_save($fields) {
+     if (isset($fields->id)) {
+       $path = $this->do_path($this->p_creative_flight_one, $fields);
+     } else {
+       $path = $this->do_path($this->p_creative_flight, $fields);
+     }
+     return $this->model_put($path, $fields);
   }
 
   // Target
@@ -217,6 +271,7 @@ class api_toutrix {
   }
 
   function do_path($path, $fields) {
+    //var_dump($fields);
     $result = $path;
     if (!empty($fields->id))
       $result = str_replace(':id', $fields->id, $result);
@@ -230,6 +285,8 @@ class api_toutrix {
       $result = str_replace(':zoneId', $fields->zoneId, $result);
     if (!empty($fields->creativeId))
       $result = str_replace(':creativeId', $fields->creativeId, $result);
+    if (!empty($fields->flightId))
+      $result = str_replace(':flightId', $fields->flightId, $result);
     return $result;
   }
 
@@ -239,9 +296,13 @@ class api_toutrix {
     $url = $this->endpoint . $datas['path'];
 
     if (strlen($this->access_token)>0)
-      $url .= "?access_token=" . $this->access_token;
+      if (strpos($url,'?')>0) {
+        $url .= "&access_token=" . $this->access_token;
+      } else {
+        $url .= "?access_token=" . $this->access_token;
+      }
 
-//echo "URL : " . $url . "<br/>\n";
+echo "URL : " . $url . "<br/>\n";
 
     $fields = json_encode($datas['fields']);
 //echo "Fields: " . $fields . "\n";
