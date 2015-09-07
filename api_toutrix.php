@@ -302,7 +302,7 @@ class api_toutrix {
         $url .= "?access_token=" . $this->access_token;
       }
 
-echo "URL : " . $url . "<br/>\n";
+//echo "URL : " . $url . "<br/>\n";
 
     $fields = json_encode($datas['fields']);
 //echo "Fields: " . $fields . "\n";
