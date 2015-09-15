@@ -10,17 +10,21 @@ class api_toutrix_adserver extends api_toutrix {
 
   var $p_login_user = "/users/login";
   var $p_user = "/users";
+  var $p_user_one = "/users/:id";
+  var $p_get_bitcoin_address = "/users/get_bitcoin_address?id=:id";
   var $p_channels = "/channels";
   var $p_adtypes = "/adtypes";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_campaign_target = "/campaigns/:campaignId/target";
   var $p_campaign_update = "/campaigns/:id";
+  var $p_campaign_report = "/campaigns/report?id=:id&start_date=:startDate&end_date=:endDate";
   var $p_campaign_flight = "/campaigns/:campaignId/flights/:flightId";
   var $p_creative = "/users/:userId/creatives";
   var $p_creative_update = "/creatives/:id";
   var $p_user_creative = "/users/:userId/creatives/:creativeId";
   var $p_user_campaign = "/users/:userId/campaigns/:campaignId";
   var $p_sites = "/users/:userId/sites";
+  var $p_site_report = "/sites/report?id=:id&start_date=:startDate&end_date=:endDate";
   var $p_zones = "/sites/:siteId/zones";
   var $p_flight_update = "/flights/:id";
   var $p_flight = "/campaigns/:campaignId/flights";
@@ -57,11 +61,27 @@ class api_toutrix_adserver extends api_toutrix {
      }
   }
 
+  // user
+
+  function get_user() {
+    if ($this->user == null) {
+      $fields = new stdclass();
+      $fields->id = $this->userId;
+      $path = $this->do_path($this->p_user_one, $fields);
+      $this->user = $this->model_get($path, $fields);
+    }
+    return $this->user;
+  }
+   
   function user_create($fields) {
      $path = $this->do_path($this->p_user, $fields);
      return $this->model_create($path, $fields);
   }
 
+  function get_bitcoin_address($fields) {
+      $path = $this->do_path($this->p_get_bitcoin_address, $fields);
+      return $this->model_get($path, null);
+  }
 
   function setAccessToken($token) {
     $this->access_token = $token;
@@ -141,6 +161,11 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_get($path, $fields);
   }
 
+  function campaign_report($fields) {
+     $path = $this->do_path($this->p_campaign_report, $fields);
+     return $this->model_get($path, $fields);
+  }
+
   // Creative
 
   function creative_create($fields) {
@@ -170,6 +195,11 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_create($path, $fields);
   }
 
+  function site_report($fields) {
+     $path = $this->do_path($this->p_site_report, $fields);
+     return $this->model_get($path, $fields);
+  }
+
   // Zone
 
   function zone_create($fields) {
@@ -181,6 +211,7 @@ class api_toutrix_adserver extends api_toutrix {
 
   function flight_create($fields) {
      $path = $this->do_path($this->p_flight, $fields);
+     $fields->userId = $this->userId;
      return $this->model_create($path, $fields);
   }
 
@@ -196,7 +227,7 @@ class api_toutrix_adserver extends api_toutrix {
 
   function flight_update($fields) {
      $path = $this->do_path($this->p_flight_update, $fields);
-     // TODO - Create an update function
+     // TODO - Use the update function
      $datas = array('path'=> $path,
                     'method'=> 'PUT',
                     'fields'=> $fields
@@ -251,9 +282,10 @@ class api_toutrix {
   var $last_code;
   var $access_token;
   var $userId;
+  var $user;
 
   function __construct() {
-
+    $this->user = null;
   }
 
   function reset_ch() {
@@ -287,6 +319,11 @@ class api_toutrix {
       $result = str_replace(':creativeId', $fields->creativeId, $result);
     if (!empty($fields->flightId))
       $result = str_replace(':flightId', $fields->flightId, $result);
+    if (!empty($fields->startDate))
+      $result = str_replace(':startDate', $fields->startDate, $result);
+    if (!empty($fields->endDate))
+      $result = str_replace(':endDate', $fields->endDate, $result);
+
     return $result;
   }
 
