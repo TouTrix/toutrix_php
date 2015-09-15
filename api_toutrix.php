@@ -78,6 +78,11 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_create($path, $fields);
   }
 
+  function user_update($fields) {
+     $path = $this->do_path($this->p_user_one, $fields);
+     return $this->model_put($path, $fields);
+  }
+
   function get_bitcoin_address($fields) {
       $path = $this->do_path($this->p_get_bitcoin_address, $fields);
       return $this->model_get($path, null);
