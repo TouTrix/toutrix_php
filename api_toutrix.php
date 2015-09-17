@@ -1,5 +1,6 @@
 <?php
 // TODO - Add caching on some models like creatives
+// TODO - Also be able to use MemCached
 
 define("channel_mainstream",1);
 define("channel_adult",2);
@@ -26,6 +27,7 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_sites = "/users/:userId/sites";
   var $p_site_report = "/sites/report?id=:id&start_date=:startDate&end_date=:endDate";
   var $p_zones = "/sites/:siteId/zones";
+  var $p_zone_one = "/zones";
   var $p_flight_update = "/flights/:id";
   var $p_flight = "/campaigns/:campaignId/flights";
   var $p_flight_target = "/flights/:flightId/targets";
@@ -61,6 +63,11 @@ class api_toutrix_adserver extends api_toutrix {
      }
   }
 
+  function setAccessToken($token) {
+    $this->access_token = $token;
+    // TODO - We have to get the userId
+  }
+
   // user
 
   function get_user() {
@@ -83,14 +90,11 @@ class api_toutrix_adserver extends api_toutrix {
      return $this->model_put($path, $fields);
   }
 
+  // Bitcoin
+
   function get_bitcoin_address($fields) {
       $path = $this->do_path($this->p_get_bitcoin_address, $fields);
       return $this->model_get($path, null);
-  }
-
-  function setAccessToken($token) {
-    $this->access_token = $token;
-    // TODO - We have to get the userId
   }
 
   function model_create($path,$fields) {
@@ -208,7 +212,7 @@ class api_toutrix_adserver extends api_toutrix {
   // Zone
 
   function zone_create($fields) {
-     $path = $this->do_path($this->p_zones, $fields);
+     $path = $this->do_path($this->p_zone_one, $fields);
      return $this->model_create($path, $fields);
   }
 
