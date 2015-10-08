@@ -17,6 +17,7 @@ class api_toutrix_adserver extends api_toutrix {
   var $p_adtypes = "/adtypes";
   var $p_campaign = "/users/:userId/campaigns";
   var $p_campaign_target = "/campaigns/:campaignId/target";
+  var $p_campaign_target_one = "/campaigns/:campaignId/target/:id";
   var $p_campaign_update = "/campaigns/:id";
   var $p_campaign_report = "/campaigns/report?id=:id&start_date=:startDate&end_date=:endDate";
   var $p_campaign_flight = "/campaigns/:campaignId/flights/:flightId";
@@ -64,7 +65,7 @@ class api_toutrix_adserver extends api_toutrix {
      }
 
      $returns = json_decode($output,false);
-     if ($returns->error != null) {
+     if ($returns->error <> null) {
        echo "ERROR\n";
        return false;
      }
@@ -90,9 +91,14 @@ class api_toutrix_adserver extends api_toutrix {
       $fields = new stdclass();
       $fields->id = $this->userId;
       $path = $this->do_path($this->p_user_one, $fields);
-      $this->user = $this->model_get($path, $fields);
+      $user = $this->model_get($path, $fields);
+      if (!$user->error) {
+        $this->user = $user;
+      }
+    } else {
+      $user = $this->user;
     }
-    return $this->user;
+    return $user;
   }
    
   function user_create($fields) {
@@ -193,6 +199,11 @@ class api_toutrix_adserver extends api_toutrix {
   function campaign_targets($fields) {
      $path = $this->do_path($this->p_campaign_target, $fields);
      return $this->model_get($path, $fields);
+  }
+
+  function campaign_targets_delete($fields) {
+     $path = $this->do_path($this->p_campaign_target_one, $fields);
+     return $this->model_delete($path, null);
   }
 
   function campaign_report($fields) {
@@ -417,9 +428,9 @@ class api_toutrix {
         $url .= "?access_token=" . $this->access_token;
       }
 
-//      echo "URL : " . $url . "<br/>\n";
+//echo "URL : " . $url . "<br/>\n";
       if ($datas['fields'] <> null) {
-//        echo "Fields : [" . $fields . "]<br\>\n";
+        //echo "Fields : [" . $fields . "]<br\>\n";
         $fields = json_encode($datas['fields']);
       } else {
         $fields = null;
